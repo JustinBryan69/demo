@@ -1,0 +1,302 @@
+Git Fix
+Initialization:
+
+Create your repository in github.
+
+Follow instructions in github, just replace git add "readme.txt" with: 
+git add .
+
+Clone/Download to any computer:
+git clone [paste your repository address]
+
+ 
+
+Saving changes from local computer to github:
+git add .
+git commit -m "put your comment here"
+git push
+
+Updating/Downloading changes:
+git pull
+
+ 
+
+Fixing errors when newly cloned:
+
+edit php.ini
+Open using notepad, run as administrator
+
+remove semicolon
+extension=zip
+
+Run `git clone 'link projer github'
+Run composer install
+Run cp .env.example .env or copy .env.example .env
+Run php artisan key:generate
+Run php artisan migrate
+Run php artisan db:seed
+Run php artisan serve
+
+Go to link localhost:8000 OR 127.0.0.1:8000
+
+
+
+
+
+
+
+
+
+
+Chirper Project
+Quick Installation
+*Note: Install node.js in your computer. Installer link: Node.js (nodejs.org)Links to an external site.
+
+If you have already installed PHP and Composer on your local machine, you may create a new Laravel project via Composer:
+
+composer create-project laravel/laravel chirper
+After the project has been created, start Laravel's local development server using the Laravel's Artisan CLI serve command:
+
+cd chirper
+php artisan serve
+Once you have started the Artisan development server, your application will be accessible in your web browser at http://localhost:8000.
+
+A fresh Laravel installation
+
+For simplicity, you may use SQLite to store your application's data. To instruct Laravel to use SQLite instead of MySQL, update your new application's .env file and remove all of the DB_* environment variables except for the DB_CONNECTION variable, which should be set to sqlite:
+
+DB_CONNECTION=sqlite
+Installing Laravel Breeze
+Open a new terminal in your chirper project directory and install your chosen stack with the given commands:
+
+composer require laravel/breeze --dev
+ php artisan breeze:install blade
+Breeze will install and configure your front-end dependencies for you, so we just need to start the Vite development server to automatically recompile our CSS and refresh the browser when we make changes to our Blade templates:
+
+npm run dev
+Finally, open another terminal in your chirper project directory and run the initial database migrations to populate the database with the default tables from Laravel and Breeze:
+
+php artisan migrate
+If you refresh your new Laravel application in the browser, you should now see a "Register" link at the top-right. Follow that to see the registration form provided by Laravel Breeze.
+
+Laravel registration page
+
+Register yourself an account and log in!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--Syntax: php artisan make:controller [Controller Name ]
+*always base on model name
+
+
+Create controller for Model: User.php
+php artisan make:controller UserController
+File Generated: app\Http\Controllers\UserController.php
+
+Edit: UserController.php
+add:
+public function index(){
+    return 'Hello from users'
+}
+
+
+Add to Route:
+Route::get('/users',[UserController::class, 'index']);
+Place this on top below this code:
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+
+Test->Open Browser: http://localhost:8000/users/
+
+
+Passing Parameters:
+Add to: UserController.php
+public function show($id){
+return $id;
+}
+
+Add to Route: 
+Route::get( '/user/{id}',[UserController::class, 'show']);
+
+Test->Open Browser: http://localhost:8000/user/1
+Test->Open Browser: http://localhost:8000/user/2
+
+
+Edit UserController.php:
+public function show($id){
+$data=array(
+"id"=>$id,
+"name"=>"LeonardReyes",
+"age"=>30,
+"email"=>"primus.reyes@gmail.com"
+ );
+return view('user', ['data' => $data]); 
+
+Create Views for UserController:
+\resources\views
+New file: user.blade.php
+Add to user.blade.php:
+@dd($data);
+
+Test->Open Browser:http://localhost:8000/user/1
+
+Edit UserController
+Replace:
+return view('user', ['data' => $data]); 
+with:
+return view('user', $data);
+
+Edit user.blade.php
+Replace:
+@dd($data);
+with:
+Name: {{$name}} 
+<br>
+Age: {{$age}}
+<br>
+Email: {{$email}}
+
+--
+
+
+Connect database MySQL using XAMPP
+Open XAMPP, run Apache and MySQL
+Access phpMyadmin: http://localhost/phpmyadmin/
+Create database: demo
+if you encounter an error: edit php.ini (extension: pdo_mysql)
+
+Seeding the database:
+Edit: \database\seeders\DatabaseSeeder.php
+Uncomment: \App\Models\User::factory(10)->create();
+php artisan migrate:refresh --seed
+Check your database, table users. It should be populated
+
+Note: If you are using SQLITE, run this in the terminal:
+
+php artisan tinker
+ $users = User::all();
+ 
+
+ 
+
+MODELS:
+php artisan make:model Customer
+php artisan make:controller CustomerController
+Files Generated: 
+Model: Customer.php
+Controller: CustomerController.php
+
+
+ROUTE: 
+use App\Http\Controllers\CustomerController;
+Route::get('/customers', [CustomerController::class, 'index']);
+
+Edit CustomerController.php
+public function index()
+    {
+        return 'Customers';
+    }
+
+Test it it's working: http://127.0.0.1:8000/customers
+
+
+POPULATE DATABASE
+Create migration: 
+php artisan make:migration customer_table
+
+Edit migration file:
+Add to function up:
+Schema::create('customers', function (Blueprint $table) {
+            $table->id();
+            $table->string('lastName');
+            $table->string('firstName');
+            $table->string('email');
+            $table->string('contactNumber');
+            $table->string('address');
+            $table->timestamps();
+        });
+
+Add to function down:
+Schema::dropIfExists('customers');
+
+Create Factory:
+php artisan make:factory CustomerFactory
+Edit CustomerFactory.php
+return [
+'lastName'=>fake()->lastname(),
+'firstName'=>fake()->firstname(),
+'contactNumber'=>fake()->phoneNumber(),
+'address'=>fake()->address(),
+'email'=>fake()->SafeEmail(),
+];
+
+Edit: DatabaseSeeder.php: 
+\App\Models\Customer::factory(10)->create();
+
+Populate Database:
+php artisan migrate:refresh --seed
+Check Database if it has been populated.
+
+
+Creating New View
+Create folder: customer
+Add New blade: index.blade.php
+Edit index.blade.php
+@foreach ($customers as $customer)
+{{$customer->firstName}}
+@endforeach
+
+EditCustomerController.php
+use App\Models\Customer;
+
+public function index()
+    {
+        //return 'Customers';
+
+        $data = Customer::all();
+        return view('customer.index',['customers'=>$data]);
+
+    }
+
+        
+Test your output: http://127.0.0.1:8000/customers
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
